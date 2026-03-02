@@ -80,6 +80,18 @@ function FieldRendererInner(props: FieldDefinition) {
         onChange: onChange as (v: boolean) => void,
         disabled,
       })
+    case 'number':
+      return registry.number({
+        label: props.label,
+        name: props.name,
+        value: (value as number | null) ?? null,
+        onChange: onChange as (v: number | null) => void,
+        format: props.format,
+        step: props.step,
+        min: props.min,
+        max: props.max,
+        disabled,
+      })
   }
 }
 

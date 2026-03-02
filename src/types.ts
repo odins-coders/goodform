@@ -1,4 +1,4 @@
-export type FieldValue = string | string[] | boolean | Date | null
+export type FieldValue = string | string[] | boolean | number | Date | null
 
 export type FormValues = Record<string, FieldValue>
 
@@ -27,14 +27,17 @@ export type FormBuilderProps = {
   defaultValues?: FormValues
 }
 
+export type NumberFormat = 'number' | 'currency' | 'percentage'
+
 export type FieldRegistry = {
-  text:     (props: { label: string; name: string; value: string;    onChange: (v: string)   => void; disabled?: boolean }) => React.ReactNode
-  select:   (props: { label: string; name: string; options: string[]; value: string;    onChange: (v: string)   => void; disabled?: boolean }) => React.ReactNode
-  radio:    (props: { label: string; name: string; options: string[]; value: string;    onChange: (v: string)   => void; disabled?: boolean }) => React.ReactNode
-  checkbox:     (props: { label: string; name: string; options: string[]; value: string[]; onChange: (v: string[]) => void; disabled?: boolean }) => React.ReactNode
-  multiselect:  (props: { label: string; name: string; options: string[]; value: string[]; onChange: (v: string[]) => void; disabled?: boolean }) => React.ReactNode
-  date:         (props: { label: string; name: string; value: Date | null; onChange: (v: Date | null) => void; disabled?: boolean }) => React.ReactNode
-  switch:       (props: { label: string; name: string; value: boolean;     onChange: (v: boolean)     => void; disabled?: boolean }) => React.ReactNode
+  text:        (props: { label: string; name: string; value: string;    onChange: (v: string)   => void; disabled?: boolean }) => React.ReactNode
+  select:      (props: { label: string; name: string; options: string[]; value: string;    onChange: (v: string)   => void; disabled?: boolean }) => React.ReactNode
+  radio:       (props: { label: string; name: string; options: string[]; value: string;    onChange: (v: string)   => void; disabled?: boolean }) => React.ReactNode
+  checkbox:    (props: { label: string; name: string; options: string[]; value: string[]; onChange: (v: string[]) => void; disabled?: boolean }) => React.ReactNode
+  multiselect: (props: { label: string; name: string; options: string[]; value: string[]; onChange: (v: string[]) => void; disabled?: boolean }) => React.ReactNode
+  date:        (props: { label: string; name: string; value: Date | null; onChange: (v: Date | null) => void; disabled?: boolean }) => React.ReactNode
+  switch:      (props: { label: string; name: string; value: boolean;    onChange: (v: boolean)    => void; disabled?: boolean }) => React.ReactNode
+  number:      (props: { label: string; name: string; value: number | null; onChange: (v: number | null) => void; format?: NumberFormat; step?: number; min?: number; max?: number; disabled?: boolean }) => React.ReactNode
 }
 
 export type TextFieldDefinition = {
@@ -80,16 +83,6 @@ export type CheckboxFieldDefinition = {
   dependsOn?: FieldDependency
 }
 
-export type DateFieldDefinition = {
-  type: 'date'
-  label: string
-  name: string
-  visible?: boolean
-  disabled?: boolean
-  defaultValue?: Date
-  dependsOn?: FieldDependency
-}
-
 export type MultiSelectFieldDefinition = {
   type: 'multiselect'
   label: string
@@ -98,6 +91,16 @@ export type MultiSelectFieldDefinition = {
   visible?: boolean
   disabled?: boolean
   defaultValue?: string[]
+  dependsOn?: FieldDependency
+}
+
+export type DateFieldDefinition = {
+  type: 'date'
+  label: string
+  name: string
+  visible?: boolean
+  disabled?: boolean
+  defaultValue?: Date
   dependsOn?: FieldDependency
 }
 
@@ -111,6 +114,20 @@ export type SwitchFieldDefinition = {
   dependsOn?: FieldDependency
 }
 
+export type NumberFieldDefinition = {
+  type: 'number'
+  label: string
+  name: string
+  format?: NumberFormat
+  step?: number
+  min?: number
+  max?: number
+  visible?: boolean
+  disabled?: boolean
+  defaultValue?: number
+  dependsOn?: FieldDependency
+}
+
 export type FieldDefinition =
   | TextFieldDefinition
   | SelectFieldDefinition
@@ -119,3 +136,4 @@ export type FieldDefinition =
   | MultiSelectFieldDefinition
   | DateFieldDefinition
   | SwitchFieldDefinition
+  | NumberFieldDefinition
