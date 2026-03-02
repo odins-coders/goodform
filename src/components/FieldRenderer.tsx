@@ -64,6 +64,15 @@ function FieldRendererInner(props: FieldDefinition) {
         onChange: onChange as (v: string[]) => void,
         disabled,
       })
+    case 'autocomplete':
+      return registry.autocomplete({
+        label: props.label,
+        name: props.name,
+        options,
+        value: (value as string) ?? '',
+        onChange: onChange as (v: string) => void,
+        disabled,
+      })
     case 'date':
       return registry.date({
         label: props.label,

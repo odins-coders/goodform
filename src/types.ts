@@ -30,14 +30,15 @@ export type FormBuilderProps = {
 export type NumberFormat = 'number' | 'currency' | 'percentage'
 
 export type FieldRegistry = {
-  text:        (props: { label: string; name: string; value: string;    onChange: (v: string)   => void; disabled?: boolean }) => React.ReactNode
-  select:      (props: { label: string; name: string; options: string[]; value: string;    onChange: (v: string)   => void; disabled?: boolean }) => React.ReactNode
-  radio:       (props: { label: string; name: string; options: string[]; value: string;    onChange: (v: string)   => void; disabled?: boolean }) => React.ReactNode
-  checkbox:    (props: { label: string; name: string; options: string[]; value: string[]; onChange: (v: string[]) => void; disabled?: boolean }) => React.ReactNode
-  multiselect: (props: { label: string; name: string; options: string[]; value: string[]; onChange: (v: string[]) => void; disabled?: boolean }) => React.ReactNode
-  date:        (props: { label: string; name: string; value: Date | null; onChange: (v: Date | null) => void; disabled?: boolean }) => React.ReactNode
-  switch:      (props: { label: string; name: string; value: boolean;    onChange: (v: boolean)    => void; disabled?: boolean }) => React.ReactNode
-  number:      (props: { label: string; name: string; value: number | null; onChange: (v: number | null) => void; format?: NumberFormat; step?: number; min?: number; max?: number; disabled?: boolean }) => React.ReactNode
+  text:         (props: { label: string; name: string; value: string;    onChange: (v: string)   => void; disabled?: boolean }) => React.ReactNode
+  select:       (props: { label: string; name: string; options: string[]; value: string;    onChange: (v: string)   => void; disabled?: boolean }) => React.ReactNode
+  radio:        (props: { label: string; name: string; options: string[]; value: string;    onChange: (v: string)   => void; disabled?: boolean }) => React.ReactNode
+  checkbox:     (props: { label: string; name: string; options: string[]; value: string[]; onChange: (v: string[]) => void; disabled?: boolean }) => React.ReactNode
+  multiselect:  (props: { label: string; name: string; options: string[]; value: string[]; onChange: (v: string[]) => void; disabled?: boolean }) => React.ReactNode
+  autocomplete: (props: { label: string; name: string; options: string[]; value: string;   onChange: (v: string)   => void; disabled?: boolean }) => React.ReactNode
+  date:         (props: { label: string; name: string; value: Date | null; onChange: (v: Date | null) => void; disabled?: boolean }) => React.ReactNode
+  switch:       (props: { label: string; name: string; value: boolean;    onChange: (v: boolean)    => void; disabled?: boolean }) => React.ReactNode
+  number:       (props: { label: string; name: string; value: number | null; onChange: (v: number | null) => void; format?: NumberFormat; step?: number; min?: number; max?: number; disabled?: boolean }) => React.ReactNode
 }
 
 export type TextFieldDefinition = {
@@ -94,6 +95,17 @@ export type MultiSelectFieldDefinition = {
   dependsOn?: FieldDependency
 }
 
+export type AutocompleteFieldDefinition = {
+  type: 'autocomplete'
+  label: string
+  name: string
+  options: string[]
+  visible?: boolean
+  disabled?: boolean
+  defaultValue?: string
+  dependsOn?: FieldDependency
+}
+
 export type DateFieldDefinition = {
   type: 'date'
   label: string
@@ -134,6 +146,7 @@ export type FieldDefinition =
   | RadioFieldDefinition
   | CheckboxFieldDefinition
   | MultiSelectFieldDefinition
+  | AutocompleteFieldDefinition
   | DateFieldDefinition
   | SwitchFieldDefinition
   | NumberFieldDefinition

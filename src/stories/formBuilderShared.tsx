@@ -80,6 +80,27 @@ export const fieldRegistry: FieldRegistry = {
       </select>
     </label>
   ),
+  autocomplete: (props) => {
+    const listId = `${props.name}-list`
+    return (
+      <label>
+        {props.label}
+        <input
+          type="text"
+          list={listId}
+          name={props.name}
+          value={props.value}
+          disabled={props.disabled}
+          onChange={(e) => props.onChange(e.target.value)}
+        />
+        <datalist id={listId}>
+          {props.options.map(option => (
+            <option value={option} key={option} />
+          ))}
+        </datalist>
+      </label>
+    )
+  },
   switch: (props) => (
     <label>
       {props.label}
