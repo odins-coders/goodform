@@ -1,4 +1,4 @@
-import { FieldRegistry } from '../types';
+import { FieldRegistry, NumberFormat } from '../types';
 
 export const fieldRegistry: FieldRegistry = {
   text: (props) => (
@@ -115,4 +115,30 @@ export const fieldRegistry: FieldRegistry = {
       ))}
     </fieldset>
   ),
+  number: (props) => {
+    const prefix: Partial<Record<NumberFormat, string>> = { currency: '$' }
+    const suffix: Partial<Record<NumberFormat, string>> = { percentage: '%' }
+    return (
+      <label>
+        {props.label}
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 2 }}>
+          {props.format && prefix[props.format]}
+          <input
+            type="number"
+            name={props.name}
+            value={props.value ?? ''}
+            step={props.step}
+            min={props.min}
+            max={props.max}
+            disabled={props.disabled}
+            onChange={(e) => {
+              const raw = e.target.value
+              props.onChange(raw === '' ? null : Number(raw))
+            }}
+          />
+          {props.format && suffix[props.format]}
+        </span>
+      </label>
+    )
+  },
 };
