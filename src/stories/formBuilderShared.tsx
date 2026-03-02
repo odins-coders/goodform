@@ -1,6 +1,3 @@
-import type { Meta } from '@storybook/react-vite';
-import { FormBuilder } from '../FormBuilder';
-import { FieldRegistryProvider } from '../hooks/useFormFieldRegistry';
 import { FieldRegistry } from '../types';
 
 export const fieldRegistry: FieldRegistry = {
@@ -69,12 +66,4 @@ export const fieldRegistry: FieldRegistry = {
       ))}
     </fieldset>
   ),
-};
-
-export const formBuilderMeta: Meta<typeof FormBuilder> = {
-  component: FormBuilder,
-  title: 'FormBuilder',
-  decorators: [
-    (Story) => <FieldRegistryProvider value={fieldRegistry}><Story /></FieldRegistryProvider>,
-  ],
 };

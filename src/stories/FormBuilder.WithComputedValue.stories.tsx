@@ -1,8 +1,22 @@
-import type { StoryObj } from '@storybook/react-vite';
-import { formBuilderMeta } from './formBuilderShared';
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { FormBuilder } from '../FormBuilder';
+import { FieldRegistryProvider } from '../hooks/useFormFieldRegistry';
+import { fieldRegistry } from './formBuilderShared';
 
-export default formBuilderMeta;
-type Story = StoryObj<typeof formBuilderMeta>;
+const meta: Meta<typeof FormBuilder> = {
+  component: FormBuilder,
+  title: 'FormBuilder',
+  decorators: [
+    (Story) => (
+      <FieldRegistryProvider value={fieldRegistry}>
+        <Story />
+      </FieldRegistryProvider>
+    ),
+  ],
+};
+
+export default meta;
+type Story = StoryObj<typeof meta>;
 
 export const WithComputedValue: Story = {
   args: {
