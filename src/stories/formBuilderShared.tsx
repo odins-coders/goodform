@@ -61,6 +61,25 @@ export const fieldRegistry: FieldRegistry = {
       />
     </label>
   ),
+  multiselect: (props) => (
+    <label>
+      {props.label}
+      <select
+        multiple
+        name={props.name}
+        value={props.value}
+        disabled={props.disabled}
+        onChange={(e) => {
+          const selected = Array.from(e.target.selectedOptions, (o) => o.value)
+          props.onChange(selected)
+        }}
+      >
+        {props.options.map(option => (
+          <option value={option} key={option}>{option}</option>
+        ))}
+      </select>
+    </label>
+  ),
   switch: (props) => (
     <label>
       {props.label}

@@ -31,9 +31,10 @@ export type FieldRegistry = {
   text:     (props: { label: string; name: string; value: string;    onChange: (v: string)   => void; disabled?: boolean }) => React.ReactNode
   select:   (props: { label: string; name: string; options: string[]; value: string;    onChange: (v: string)   => void; disabled?: boolean }) => React.ReactNode
   radio:    (props: { label: string; name: string; options: string[]; value: string;    onChange: (v: string)   => void; disabled?: boolean }) => React.ReactNode
-  checkbox: (props: { label: string; name: string; options: string[]; value: string[]; onChange: (v: string[]) => void; disabled?: boolean }) => React.ReactNode
-  date:     (props: { label: string; name: string; value: Date | null; onChange: (v: Date | null) => void; disabled?: boolean }) => React.ReactNode
-  switch:   (props: { label: string; name: string; value: boolean;     onChange: (v: boolean)     => void; disabled?: boolean }) => React.ReactNode
+  checkbox:     (props: { label: string; name: string; options: string[]; value: string[]; onChange: (v: string[]) => void; disabled?: boolean }) => React.ReactNode
+  multiselect:  (props: { label: string; name: string; options: string[]; value: string[]; onChange: (v: string[]) => void; disabled?: boolean }) => React.ReactNode
+  date:         (props: { label: string; name: string; value: Date | null; onChange: (v: Date | null) => void; disabled?: boolean }) => React.ReactNode
+  switch:       (props: { label: string; name: string; value: boolean;     onChange: (v: boolean)     => void; disabled?: boolean }) => React.ReactNode
 }
 
 export type TextFieldDefinition = {
@@ -89,6 +90,17 @@ export type DateFieldDefinition = {
   dependsOn?: FieldDependency
 }
 
+export type MultiSelectFieldDefinition = {
+  type: 'multiselect'
+  label: string
+  name: string
+  options: string[]
+  visible?: boolean
+  disabled?: boolean
+  defaultValue?: string[]
+  dependsOn?: FieldDependency
+}
+
 export type SwitchFieldDefinition = {
   type: 'switch'
   label: string
@@ -104,5 +116,6 @@ export type FieldDefinition =
   | SelectFieldDefinition
   | RadioFieldDefinition
   | CheckboxFieldDefinition
+  | MultiSelectFieldDefinition
   | DateFieldDefinition
   | SwitchFieldDefinition

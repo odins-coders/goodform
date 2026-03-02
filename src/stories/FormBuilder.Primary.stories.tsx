@@ -45,6 +45,12 @@ export const Primary: Story = {
         options: ['Yes', 'No'],
       },
       {
+        type: 'multiselect',
+        label: 'Interests',
+        name: 'interests',
+        options: ['Sports', 'Music', 'Travel', 'Food', 'Tech'],
+      },
+      {
         type: 'date',
         label: 'Birth Date',
         name: 'birthDate',
