@@ -49,6 +49,13 @@ function FieldRendererInner(props: FieldDefinition) {
         value: (value as string[]) ?? [],
         onChange: onChange as (v: string[]) => void,
       })
+    case 'date':
+      return registry.date({
+        label: props.label,
+        name: props.name,
+        value: (value as Date | null) ?? null,
+        onChange: onChange as (v: Date | null) => void,
+      })
   }
 }
 

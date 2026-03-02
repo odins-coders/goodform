@@ -44,6 +44,20 @@ export const fieldRegistry: FieldRegistry = {
       ))}
     </fieldset>
   ),
+  date: (props) => (
+    <label>
+      {props.label}
+      <input
+        type="date"
+        name={props.name}
+        value={props.value ? props.value.toISOString().split('T')[0] : ''}
+        onChange={(e) => {
+          const raw = e.target.value
+          props.onChange(raw ? new Date(raw + 'T00:00:00') : null)
+        }}
+      />
+    </label>
+  ),
   checkbox: (props) => (
     <fieldset>
       <legend>{props.label}</legend>

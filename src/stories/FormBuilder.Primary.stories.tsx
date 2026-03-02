@@ -44,6 +44,12 @@ export const Primary: Story = {
         name: 'agree',
         options: ['Yes', 'No'],
       },
+      {
+        type: 'date',
+        label: 'Birth Date',
+        name: 'birthDate',
+        defaultValue: new Date('1990-01-01T00:00:00'),
+      },
     ],
     onSubmit: console.log,
   },

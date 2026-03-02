@@ -1,4 +1,4 @@
-export type FieldValue = string | string[] | null
+export type FieldValue = string | string[] | Date | null
 
 export type FormValues = Record<string, FieldValue>
 
@@ -24,6 +24,7 @@ export type FieldRegistry = {
   select:   (props: { label: string; name: string; options: string[]; value: string;    onChange: (v: string)   => void }) => React.ReactNode
   radio:    (props: { label: string; name: string; options: string[]; value: string;    onChange: (v: string)   => void }) => React.ReactNode
   checkbox: (props: { label: string; name: string; options: string[]; value: string[]; onChange: (v: string[]) => void }) => React.ReactNode
+  date:     (props: { label: string; name: string; value: Date | null; onChange: (v: Date | null) => void }) => React.ReactNode
 }
 
 export type TextFieldDefinition = {
@@ -61,8 +62,17 @@ export type CheckboxFieldDefinition = {
   dependsOn?: FieldDependency
 }
 
+export type DateFieldDefinition = {
+  type: 'date'
+  label: string
+  name: string
+  defaultValue?: Date
+  dependsOn?: FieldDependency
+}
+
 export type FieldDefinition =
   | TextFieldDefinition
   | SelectFieldDefinition
   | RadioFieldDefinition
   | CheckboxFieldDefinition
+  | DateFieldDefinition
