@@ -50,6 +50,12 @@ export const Primary: Story = {
         name: 'birthDate',
         defaultValue: new Date('1990-01-01T00:00:00'),
       },
+      {
+        type: 'switch',
+        label: 'Subscribe to newsletter',
+        name: 'newsletter',
+        defaultValue: false,
+      },
     ],
     onSubmit: console.log,
   },

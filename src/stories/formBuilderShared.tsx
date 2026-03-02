@@ -61,6 +61,19 @@ export const fieldRegistry: FieldRegistry = {
       />
     </label>
   ),
+  switch: (props) => (
+    <label>
+      {props.label}
+      <input
+        type="checkbox"
+        role="switch"
+        name={props.name}
+        checked={props.value}
+        disabled={props.disabled}
+        onChange={(e) => props.onChange(e.target.checked)}
+      />
+    </label>
+  ),
   checkbox: (props) => (
     <fieldset disabled={props.disabled}>
       <legend>{props.label}</legend>

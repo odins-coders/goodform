@@ -63,6 +63,14 @@ function FieldRendererInner(props: FieldDefinition) {
         onChange: onChange as (v: Date | null) => void,
         disabled,
       })
+    case 'switch':
+      return registry.switch({
+        label: props.label,
+        name: props.name,
+        value: (value as boolean) ?? false,
+        onChange: onChange as (v: boolean) => void,
+        disabled,
+      })
   }
 }
 
