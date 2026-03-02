@@ -7,7 +7,7 @@ function FieldRendererInner(props: FieldDefinition) {
   const registry = useFieldRegistry()
   const store = useFormStore()
 
-  const { value, options } = useSyncExternalStore(
+  const { value, options, visible, disabled } = useSyncExternalStore(
     store.subscribeToField(props.name),
     store.getFieldSnapshot(props.name),
   )
@@ -17,6 +17,8 @@ function FieldRendererInner(props: FieldDefinition) {
     [store, props.name],
   )
 
+  if (!visible) return null
+
   switch (props.type) {
     case 'text':
       return registry.text({
@@ -24,6 +26,7 @@ function FieldRendererInner(props: FieldDefinition) {
         name: props.name,
         value: (value as string) ?? '',
         onChange: onChange as (v: string) => void,
+        disabled,
       })
     case 'select':
       return registry.select({
@@ -32,6 +35,7 @@ function FieldRendererInner(props: FieldDefinition) {
         options,
         value: (value as string) ?? '',
         onChange: onChange as (v: string) => void,
+        disabled,
       })
     case 'radio':
       return registry.radio({
@@ -40,6 +44,7 @@ function FieldRendererInner(props: FieldDefinition) {
         options,
         value: (value as string) ?? '',
         onChange: onChange as (v: string) => void,
+        disabled,
       })
     case 'checkbox':
       return registry.checkbox({
@@ -48,6 +53,7 @@ function FieldRendererInner(props: FieldDefinition) {
         options,
         value: (value as string[]) ?? [],
         onChange: onChange as (v: string[]) => void,
+        disabled,
       })
     case 'date':
       return registry.date({
@@ -55,6 +61,7 @@ function FieldRendererInner(props: FieldDefinition) {
         name: props.name,
         value: (value as Date | null) ?? null,
         onChange: onChange as (v: Date | null) => void,
+        disabled,
       })
   }
 }

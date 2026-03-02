@@ -54,3 +54,46 @@ export const Primary: Story = {
     onSubmit: console.log,
   },
 };
+
+export const Conditional: Story = {
+  args: {
+    fields: [
+      {
+        type: 'radio',
+        label: 'Are you married?',
+        name: 'married',
+        options: ['yes', 'no'],
+      },
+      {
+        type: 'text',
+        label: 'Spouse Name',
+        name: 'spouse',
+        dependsOn: {
+          visible: {
+            on: ['married'],
+            compute: ({ married }) => married === 'yes',
+          },
+        },
+      },
+      {
+        type: 'text',
+        label: 'Read-only note',
+        name: 'note',
+        defaultValue: 'This field is always disabled',
+        disabled: true,
+      },
+      {
+        type: 'text',
+        label: 'Referral Code',
+        name: 'referral',
+        dependsOn: {
+          disabled: {
+            on: ['married'],
+            compute: ({ married }) => married === null,
+          },
+        },
+      },
+    ],
+    onSubmit: console.log,
+  },
+};

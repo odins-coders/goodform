@@ -8,6 +8,7 @@ export const fieldRegistry: FieldRegistry = {
         type="text"
         name={props.name}
         value={props.value}
+        disabled={props.disabled}
         onChange={(e) => props.onChange(e.target.value)}
       />
     </label>
@@ -18,6 +19,7 @@ export const fieldRegistry: FieldRegistry = {
       <select
         name={props.name}
         value={props.value}
+        disabled={props.disabled}
         onChange={(e) => props.onChange(e.target.value)}
       >
         <option value="">-- select --</option>
@@ -28,7 +30,7 @@ export const fieldRegistry: FieldRegistry = {
     </label>
   ),
   radio: (props) => (
-    <fieldset>
+    <fieldset disabled={props.disabled}>
       <legend>{props.label}</legend>
       {props.options.map(option => (
         <label key={option}>
@@ -51,6 +53,7 @@ export const fieldRegistry: FieldRegistry = {
         type="date"
         name={props.name}
         value={props.value ? props.value.toISOString().split('T')[0] : ''}
+        disabled={props.disabled}
         onChange={(e) => {
           const raw = e.target.value
           props.onChange(raw ? new Date(raw + 'T00:00:00') : null)
@@ -59,7 +62,7 @@ export const fieldRegistry: FieldRegistry = {
     </label>
   ),
   checkbox: (props) => (
-    <fieldset>
+    <fieldset disabled={props.disabled}>
       <legend>{props.label}</legend>
       {props.options.map(option => (
         <label key={option}>

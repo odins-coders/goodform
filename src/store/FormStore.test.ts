@@ -191,4 +191,193 @@ describe('FormStore', () => {
       expect(store.getValues().b).toBe('HELLO')
     })
   })
+
+  describe('visible / disabled', () => {
+    it('static visible: false — snapshot has visible: false', () => {
+      const store = new FormStore([
+        { type: 'text', name: 'hidden', label: 'Hidden', visible: false },
+      ])
+      expect(store.getFieldSnapshot('hidden')().visible).toBe(false)
+    })
+
+    it('static disabled: true — snapshot has disabled: true', () => {
+      const store = new FormStore([
+        { type: 'text', name: 'locked', label: 'Locked', disabled: true },
+      ])
+      expect(store.getFieldSnapshot('locked')().disabled).toBe(true)
+    })
+
+    it('defaults visible to true and disabled to false', () => {
+      const store = new FormStore([
+        { type: 'text', name: 'field', label: 'Field' },
+      ])
+      const snap = store.getFieldSnapshot('field')()
+      expect(snap.visible).toBe(true)
+      expect(snap.disabled).toBe(false)
+    })
+
+    it('computed visible changes when watched field changes', () => {
+      const store = new FormStore([
+        { type: 'radio', name: 'married', label: 'Married', options: ['yes', 'no'] },
+        {
+          type: 'text',
+          name: 'spouse',
+          label: 'Spouse',
+          dependsOn: {
+            visible: { on: ['married'], compute: ({ married }) => married === 'yes' },
+          },
+        },
+      ])
+      expect(store.getFieldSnapshot('spouse')().visible).toBe(false)
+      store.setFieldValue('married', 'yes')
+      expect(store.getFieldSnapshot('spouse')().visible).toBe(true)
+      store.setFieldValue('married', 'no')
+      expect(store.getFieldSnapshot('spouse')().visible).toBe(false)
+    })
+
+    it('computed disabled changes when watched field changes', () => {
+      const store = new FormStore([
+        { type: 'text', name: 'toggle', label: 'Toggle' },
+        {
+          type: 'text',
+          name: 'dependent',
+          label: 'Dependent',
+          dependsOn: {
+            disabled: { on: ['toggle'], compute: ({ toggle }) => toggle === 'lock' },
+          },
+        },
+      ])
+      expect(store.getFieldSnapshot('dependent')().disabled).toBe(false)
+      store.setFieldValue('toggle', 'lock')
+      expect(store.getFieldSnapshot('dependent')().disabled).toBe(true)
+      store.setFieldValue('toggle', 'unlock')
+      expect(store.getFieldSnapshot('dependent')().disabled).toBe(false)
+    })
+
+    it('notifies subscriber when computed visible changes', () => {
+      const store = new FormStore([
+        { type: 'text', name: 'trigger', label: 'Trigger' },
+        {
+          type: 'text',
+          name: 'target',
+          label: 'Target',
+          dependsOn: {
+            visible: { on: ['trigger'], compute: ({ trigger }) => trigger === 'show' },
+          },
+        },
+      ])
+      const cb = vi.fn()
+      store.subscribeToField('target')(cb)
+      store.setFieldValue('trigger', 'show')
+      expect(cb).toHaveBeenCalledTimes(1)
+    })
+
+    it('does not notify subscriber when computed visible is unchanged', () => {
+      const store = new FormStore([
+        { type: 'text', name: 'trigger', label: 'Trigger' },
+        {
+          type: 'text',
+          name: 'target',
+          label: 'Target',
+          dependsOn: {
+            visible: { on: ['trigger'], compute: () => true }, // always true
+          },
+        },
+      ])
+      // Set trigger once to initialise
+      store.setFieldValue('trigger', 'a')
+      const cb = vi.fn()
+      store.subscribeToField('target')(cb)
+      store.setFieldValue('trigger', 'b') // visible stays true
+      expect(cb).not.toHaveBeenCalled()
+    })
+
+    describe('hidden field value clearing', () => {
+      it('clears value to null when field becomes hidden', () => {
+        const store = new FormStore([
+          { type: 'radio', name: 'married', label: 'Married', options: ['yes', 'no'] },
+          {
+            type: 'text',
+            name: 'spouse',
+            label: 'Spouse',
+            dependsOn: {
+              visible: { on: ['married'], compute: ({ married }) => married === 'yes' },
+            },
+          },
+        ])
+        store.setFieldValue('married', 'yes')
+        store.setFieldValue('spouse', 'Jane')
+        store.setFieldValue('married', 'no')
+        expect(store.getFieldSnapshot('spouse')().value).toBeNull()
+      })
+
+      it('value stays null after field becomes visible again', () => {
+        const store = new FormStore([
+          { type: 'radio', name: 'married', label: 'Married', options: ['yes', 'no'] },
+          {
+            type: 'text',
+            name: 'spouse',
+            label: 'Spouse',
+            dependsOn: {
+              visible: { on: ['married'], compute: ({ married }) => married === 'yes' },
+            },
+          },
+        ])
+        store.setFieldValue('married', 'yes')
+        store.setFieldValue('spouse', 'Jane')
+        store.setFieldValue('married', 'no')  // hides + clears
+        store.setFieldValue('married', 'yes') // shows again
+        expect(store.getFieldSnapshot('spouse')().value).toBeNull()
+      })
+
+      it('getValues() includes hidden field with null value', () => {
+        const store = new FormStore([
+          { type: 'radio', name: 'married', label: 'Married', options: ['yes', 'no'] },
+          {
+            type: 'text',
+            name: 'spouse',
+            label: 'Spouse',
+            dependsOn: {
+              visible: { on: ['married'], compute: ({ married }) => married === 'yes' },
+            },
+          },
+        ])
+        store.setFieldValue('married', 'yes')
+        store.setFieldValue('spouse', 'Jane')
+        store.setFieldValue('married', 'no')
+        expect(store.getValues()).toMatchObject({ married: 'no', spouse: null })
+      })
+
+      it('propagates cleared value to fields that depend on the hidden field', () => {
+        const store = new FormStore([
+          { type: 'radio', name: 'married', label: 'Married', options: ['yes', 'no'] },
+          {
+            type: 'text',
+            name: 'spouse',
+            label: 'Spouse',
+            dependsOn: {
+              visible: { on: ['married'], compute: ({ married }) => married === 'yes' },
+            },
+          },
+          {
+            type: 'text',
+            name: 'greeting',
+            label: 'Greeting',
+            dependsOn: {
+              value: {
+                on: ['spouse'],
+                compute: ({ spouse }) => (spouse ? `Hello ${spouse}` : null),
+              },
+            },
+          },
+        ])
+        store.setFieldValue('married', 'yes')
+        store.setFieldValue('spouse', 'Jane')
+        expect(store.getFieldSnapshot('greeting')().value).toBe('Hello Jane')
+
+        store.setFieldValue('married', 'no') // hides spouse → clears value → greeting recomputes
+        expect(store.getFieldSnapshot('greeting')().value).toBeNull()
+      })
+    })
+  })
 })

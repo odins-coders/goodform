@@ -11,6 +11,14 @@ export type FieldDependency = {
     on: string[]
     compute: (depValues: FormValues) => string[]
   }
+  visible?: {
+    on: string[]
+    compute: (depValues: FormValues) => boolean
+  }
+  disabled?: {
+    on: string[]
+    compute: (depValues: FormValues) => boolean
+  }
 }
 
 export type FormBuilderProps = {
@@ -20,17 +28,19 @@ export type FormBuilderProps = {
 }
 
 export type FieldRegistry = {
-  text:     (props: { label: string; name: string; value: string;    onChange: (v: string)   => void }) => React.ReactNode
-  select:   (props: { label: string; name: string; options: string[]; value: string;    onChange: (v: string)   => void }) => React.ReactNode
-  radio:    (props: { label: string; name: string; options: string[]; value: string;    onChange: (v: string)   => void }) => React.ReactNode
-  checkbox: (props: { label: string; name: string; options: string[]; value: string[]; onChange: (v: string[]) => void }) => React.ReactNode
-  date:     (props: { label: string; name: string; value: Date | null; onChange: (v: Date | null) => void }) => React.ReactNode
+  text:     (props: { label: string; name: string; value: string;    onChange: (v: string)   => void; disabled?: boolean }) => React.ReactNode
+  select:   (props: { label: string; name: string; options: string[]; value: string;    onChange: (v: string)   => void; disabled?: boolean }) => React.ReactNode
+  radio:    (props: { label: string; name: string; options: string[]; value: string;    onChange: (v: string)   => void; disabled?: boolean }) => React.ReactNode
+  checkbox: (props: { label: string; name: string; options: string[]; value: string[]; onChange: (v: string[]) => void; disabled?: boolean }) => React.ReactNode
+  date:     (props: { label: string; name: string; value: Date | null; onChange: (v: Date | null) => void; disabled?: boolean }) => React.ReactNode
 }
 
 export type TextFieldDefinition = {
   type: 'text'
   label: string
   name: string
+  visible?: boolean
+  disabled?: boolean
   defaultValue?: string
   dependsOn?: FieldDependency
 }
@@ -40,6 +50,8 @@ export type SelectFieldDefinition = {
   label: string
   name: string
   options: string[]
+  visible?: boolean
+  disabled?: boolean
   defaultValue?: string
   dependsOn?: FieldDependency
 }
@@ -49,6 +61,8 @@ export type RadioFieldDefinition = {
   label: string
   name: string
   options: string[]
+  visible?: boolean
+  disabled?: boolean
   defaultValue?: string
   dependsOn?: FieldDependency
 }
@@ -58,6 +72,8 @@ export type CheckboxFieldDefinition = {
   label: string
   name: string
   options: string[]
+  visible?: boolean
+  disabled?: boolean
   defaultValue?: string[]
   dependsOn?: FieldDependency
 }
@@ -66,6 +82,8 @@ export type DateFieldDefinition = {
   type: 'date'
   label: string
   name: string
+  visible?: boolean
+  disabled?: boolean
   defaultValue?: Date
   dependsOn?: FieldDependency
 }

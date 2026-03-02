@@ -3,11 +3,13 @@ import type { FieldDefinition, FieldDependency, FormValues, FieldValue } from '.
 export type FieldSnapshot = {
   value: FieldValue
   options: string[]
+  visible: boolean
+  disabled: boolean
 }
 
 type DependentEdge = {
   field: string
-  concern: 'value' | 'options'
+  concern: 'value' | 'options' | 'visible' | 'disabled'
 }
 
 function shallowEqualArrays(a: string[], b: string[]): boolean {
@@ -22,6 +24,8 @@ function shallowEqualArrays(a: string[], b: string[]): boolean {
 export class FormStore {
   private _values: Map<string, FieldValue> = new Map()
   private _options: Map<string, string[]> = new Map()
+  private _visible: Map<string, boolean> = new Map()
+  private _disabled: Map<string, boolean> = new Map()
   private _snapshots: Map<string, FieldSnapshot> = new Map()
   private _subscribers: Map<string, Set<() => void>> = new Map()
   private _dependents: Map<string, DependentEdge[]> = new Map()
@@ -60,6 +64,12 @@ export class FormStore {
       }
     }
 
+    // Initialise static visible/disabled
+    for (const field of fields) {
+      this._visible.set(field.name, (field as any).visible ?? true)
+      this._disabled.set(field.name, (field as any).disabled ?? false)
+    }
+
     // Build reverse adjacency map
     this._buildDependentsMap(fields)
 
@@ -83,11 +93,26 @@ export class FormStore {
       }
     }
 
+    // Resolve initial computed visible/disabled
+    for (const field of fields) {
+      const dep = ('dependsOn' in field ? (field as any).dependsOn : undefined) as FieldDependency | undefined
+      if (dep?.visible) {
+        const depValues = this._collectDepValues(dep.visible.on)
+        this._visible.set(field.name, dep.visible.compute(depValues))
+      }
+      if (dep?.disabled) {
+        const depValues = this._collectDepValues(dep.disabled.on)
+        this._disabled.set(field.name, dep.disabled.compute(depValues))
+      }
+    }
+
     // Pre-build snapshots
     for (const field of fields) {
       this._snapshots.set(field.name, {
         value: this._values.get(field.name) ?? null,
         options: this._options.get(field.name) ?? [],
+        visible: this._visible.get(field.name) ?? true,
+        disabled: this._disabled.get(field.name) ?? false,
       })
     }
   }
@@ -112,6 +137,22 @@ export class FormStore {
           this._dependents.set(watchedField, edges)
         }
       }
+
+      if (dep.visible?.on) {
+        for (const watchedField of dep.visible.on) {
+          const edges = this._dependents.get(watchedField) ?? []
+          edges.push({ field: field.name, concern: 'visible' })
+          this._dependents.set(watchedField, edges)
+        }
+      }
+
+      if (dep.disabled?.on) {
+        for (const watchedField of dep.disabled.on) {
+          const edges = this._dependents.get(watchedField) ?? []
+          edges.push({ field: field.name, concern: 'disabled' })
+          this._dependents.set(watchedField, edges)
+        }
+      }
     }
   }
 
@@ -124,12 +165,15 @@ export class FormStore {
   }
 
   private _notify(name: string): void {
+    console.log('_notify',name)
     // Rebuild snapshot
     const prev = this._snapshots.get(name)
     const value = this._values.get(name) ?? null
     const options = this._options.get(name) ?? []
-    if (prev && prev.value === value && prev.options === options) return
-    this._snapshots.set(name, { value, options })
+    const visible = this._visible.get(name) ?? true
+    const disabled = this._disabled.get(name) ?? false
+    if (prev && prev.value === value && prev.options === options && prev.visible === visible && prev.disabled === disabled) return
+    this._snapshots.set(name, { value, options, visible, disabled })
     const subs = this._subscribers.get(name)
     if (subs) {
       for (const cb of subs) cb()
@@ -137,6 +181,7 @@ export class FormStore {
   }
 
   private _propagateDependents(changedField: string): void {
+    console.log('_propagateDependents', changedField)
     // BFS
     const queue: string[] = [changedField]
     const visited = new Set<string>()
@@ -180,6 +225,31 @@ export class FormStore {
           }
         }
 
+        // Update visible if this edge is relevant
+        if (dep.visible?.on.includes(current)) {
+          const depValues = this._collectDepValues(dep.visible.on)
+          const newVisible = dep.visible.compute(depValues)
+          const prevVisible = this._visible.get(depField) ?? true
+          if (prevVisible !== newVisible) {
+            this._visible.set(depField, newVisible)
+            if (!newVisible) {
+              this._values.set(depField, null)
+            }
+            changed = true
+          }
+        }
+
+        // Update disabled if this edge is relevant
+        if (dep.disabled?.on.includes(current)) {
+          const depValues = this._collectDepValues(dep.disabled.on)
+          const newDisabled = dep.disabled.compute(depValues)
+          const prevDisabled = this._disabled.get(depField) ?? false
+          if (prevDisabled !== newDisabled) {
+            this._disabled.set(depField, newDisabled)
+            changed = true
+          }
+        }
+
         if (changed) {
           this._notify(depField)
           queue.push(depField)
@@ -205,7 +275,7 @@ export class FormStore {
   getFieldSnapshot(name: string): () => FieldSnapshot {
     if (!this._snapshotRefs.has(name)) {
       this._snapshotRefs.set(name, () => {
-        return this._snapshots.get(name) ?? { value: null, options: [] }
+        return this._snapshots.get(name) ?? { value: null, options: [], visible: true, disabled: false }
       })
     }
     return this._snapshotRefs.get(name)!
